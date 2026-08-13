@@ -20,11 +20,7 @@ function Login() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Inputs>({
+  const {register,handleSubmit,formState: { errors },} = useForm<Inputs>({
     resolver: zodResolver(loginSchema),
   });
 

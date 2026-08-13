@@ -7,6 +7,7 @@ import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
 import AdminHeader from "@/components/admin/admin-header";
 
+
 const navItems = [
   {
     href: "/admin",
@@ -18,16 +19,12 @@ const navItems = [
   {
     href: "/admin/products",
     label: "Товары",
-    icon: (
-      <path d="M21 8 12 3 3 8v8l9 5 9-5V8ZM3 8l9 5 9-5M12 13v8" />
-    ),
+    icon: <path d="M21 8 12 3 3 8v8l9 5 9-5V8ZM3 8l9 5 9-5M12 13v8" />,
   },
   {
     href: "/admin/categories",
     label: "Категории",
-    icon: (
-      <path d="M4 6h16M4 12h16M4 18h10" />
-    ),
+    icon: <path d="M4 6h16M4 12h16M4 18h10" />,
   },
   {
     href: "/admin/orders",
@@ -68,40 +65,40 @@ export default function AdminLayout({
     <div className="min-h-screen bg-background">
       <AdminHeader />
       <div className="flex min-h-[calc(100vh-72px)]">
-        <aside className="sticky top-18 flex h-[calc(100vh-72px)] w-60 shrink-0 flex-col bg-white px-3 py-6">
-        <nav className="flex flex-col gap-1">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
-                isActive(item.href)
-                  ? "bg-black text-white"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-              }`}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-5 w-5 shrink-0"
+        <aside className="sticky top-18 flex border h-[calc(100vh-72px)] w-60 shrink-0 flex-col bg-card px-3 py-6">
+          <nav className="flex flex-col gap-1">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
+                  isActive(item.href)
+                    ? "bg-black text-white"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                }`}
               >
-                {item.icon}
-              </svg>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-5 w-5 shrink-0"
+                >
+                  {item.icon}
+                </svg>
+                {item.label}
+              </Link>
+            ))}
+          </nav>
 
           <button className="mt-auto rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-600 transition hover:bg-gray-100 hover:text-gray-900">
             logout
           </button>
         </aside>
-        <main className="flex-1 p-8">{children}</main>
+        <main className="flex-1 bg-background p-8">{children}</main>
       </div>
     </div>
   );
