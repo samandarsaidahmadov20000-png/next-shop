@@ -7,7 +7,6 @@ import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
 import AdminHeader from "@/components/admin/admin-header";
 
-
 const navItems = [
   {
     href: "/admin",
@@ -31,6 +30,29 @@ const navItems = [
     label: "Заказы",
     icon: (
       <path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.8h7.2a2 2 0 0 0 2-1.6L20 8H6M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm8 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" />
+    ),
+  },
+
+  {
+    href: "/admin/message",
+    label: "сообщения ",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="1em"
+        height="1em"
+        viewBox="0 0 24 24"
+      >
+        <title xmlns="">message</title>
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M8 9h8m-8 4h6m4-9a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-5l-5 3v-3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3z"
+        />
+      </svg>
     ),
   },
 ];

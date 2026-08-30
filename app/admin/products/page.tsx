@@ -54,6 +54,8 @@ function Products() {
     productdeleteMutation.mutate(id);
   }
 
+  console.log(data);
+
   return (
     <div className="rounded-2xl border border-border bg-card p-2 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-3 px-3 py-3">
@@ -107,7 +109,7 @@ function Products() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data?.map((invoice) => (
+            {data?.products?.map((invoice) => (
               <TableRow
                 key={invoice._id}
                 className="border-b border-border last:border-b-0 hover:bg-muted/40"

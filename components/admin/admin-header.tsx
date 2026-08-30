@@ -11,6 +11,7 @@ import {
 
 import { useTheme } from "next-themes";
 import ThemeToggle from "../themeToggle";
+import { useEffect, useState } from "react";
 
 const pageTitles: Record<string, string> = {
   "/admin": "Дашборд",
@@ -37,6 +38,7 @@ export default function AdminHeader({
   const pathname = usePathname();
   const heading = title ?? pageTitles[pathname] ?? "Дашборд";
   const { theme, setTheme } = useTheme();
+
 
   return (
     <header className="sticky top-0 z-30 flex h-[72px] items-center bg-card border">

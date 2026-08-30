@@ -20,19 +20,10 @@ import OrderStatusSelect from "./_components/order-status-select";
 import Link from "next/link";
 
 function Orders() {
-  
-
-  
   const { data, error, isError, isLoading } = useQuery({
     queryKey: ["orders"],
     queryFn: orderService.getAll,
   });
-
-
-  
-  
-  // console.log(data?.order);
-  
 
 
 
@@ -77,6 +68,9 @@ function Orders() {
                 Order ID
               </TableHead>
               <TableHead className="h-11 px-4 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                Name
+              </TableHead>
+              <TableHead className="h-11 px-4 text-xs font-medium tracking-wide text-muted-foreground uppercase">
                 Total
               </TableHead>
               <TableHead className="h-11 px-4 text-xs font-medium tracking-wide text-muted-foreground uppercase">
@@ -100,6 +94,10 @@ function Orders() {
                   <TableCell className="px-4 py-3.5 font-mono text-xs text-muted-foreground">
                     {orders?._id}
                   </TableCell>
+                  <TableCell className="px-4 py-3.5 font-mono text-xs text-muted-foreground">
+                    {orders?.items?.map((item: any) => item?.product?.name)}
+                  </TableCell>
+
                   <TableCell className="px-4 py-3.5 text-sm font-medium">
                     {orders?.totalPrice}
                   </TableCell>
