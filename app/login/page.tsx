@@ -8,6 +8,8 @@ import { authService } from "@/services/auth.service";
 import { jwtDecode } from "jwt-decode";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { authStore } from "@/store/authStore";
 
 const loginSchema = z.object({
   email: z.string().min(3, "Too short").max(50, "Too long"),
@@ -19,8 +21,12 @@ type Inputs = z.infer<typeof loginSchema>;
 function Login() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-
-  const {register,handleSubmit,formState: { errors },} = useForm<Inputs>({
+  const { login } = authStore();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Inputs>({
     resolver: zodResolver(loginSchema),
   });
 
@@ -28,6 +34,8 @@ function Login() {
     try {
       const result = await authService.login(data);
       localStorage.setItem("token", result.token);
+      login();
+      console.log("LOGIN SUCCESS");
       const decoded = jwtDecode<{ id: string; role: string }>(result.token);
 
       if (decoded.role == "admin") {
@@ -155,9 +163,12 @@ function Login() {
         </form>
 
         <p className="mt-4 text-center text-sm text-gray-600">
-          <a href="#" className="hover:text-gray-900 hover:underline">
-            Forgot your password?
-          </a>
+          <Link
+            href="/register"
+            className="hover:text-gray-900 hover:underline"
+          >
+            пройти регистрацию
+          </Link>
         </p>
       </div>
     </div>

@@ -1,11 +1,19 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Figtree } from "next/font/google";
+import { Geist, Geist_Mono, Figtree, Archivo_Black } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import QueryProvider from "@/providers/query-provider";
 import { ThemeProvider } from "@/components/theme-provider";
+import AuthInitializer from "./AuthInitializer";
+
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
+
+const archivoBlack = Archivo_Black({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-display",
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,6 +35,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+
+  
+
+
   return (
     <html
       lang="en"
@@ -38,9 +51,11 @@ export default function RootLayout({
         geistMono.variable,
         "font-sans",
         figtree.variable,
+        archivoBlack.variable,
       )}
     >
       <body className="">
+        <AuthInitializer />
         <QueryProvider>
           <ThemeProvider
             attribute="class"

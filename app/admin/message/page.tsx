@@ -74,7 +74,7 @@ function Message() {
           </p>
         </div>
 
-        <div className="flex flex-1 flex-col gap-1 overflow-y-auto px-2 pb-3">
+        <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 pb-3">
           {data?.conversations?.map((item) => (
             <button
               key={item._id}
@@ -132,16 +132,24 @@ function Message() {
           </div>
         </div>
 
-        {messagesData?.message?.map((item: any) => (
-          <div
-            key={item._id}
-            className={`flex flex-1 flex-col ${item.isFromAdmin ? "items-end" : "justify-start"}   gap-2 overflow-y-auto px-6 py-6`}
-          >
-            <p className="  max-w-[70%] w-fit rounded-2xl rounded-bl-md border border-border bg-card px-4 py-2.5 text-sm leading-relaxed text-foreground shadow-sm">
-              {item.text}
-            </p>
-          </div>
-        ))}
+        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-6 py-6">
+          {messagesData?.message?.map((item: any) => (
+            <div
+              key={item._id}
+              className={`flex w-full ${
+                item.isFromAdmin ? "justify-end" : "justify-start"
+              }`}
+            >
+              <p
+                className={`w-fit max-w-[70%] break-words rounded-2xl border border-border bg-card px-4 py-2.5 text-sm leading-relaxed text-foreground shadow-sm ${
+                  item.isFromAdmin ? "rounded-br-md" : "rounded-bl-md"
+                }`}
+              >
+                {item.text}
+              </p>
+            </div>
+          ))}
+        </div>
 
         <div className="shrink-0 border-t border-border bg-card px-6 py-4">
           <div className="flex items-center gap-3 rounded-full border border-border bg-background px-4 py-2 focus-within:ring-2 focus-within:ring-ring/40">

@@ -9,12 +9,15 @@ import ReusableSelect from "@/components/select";
 import { Button } from "@/components/ui/button";
 import { productService } from "@/services/product.service";
 import { Controller, useForm } from "react-hook-form";
+import Image from "next/image";
 
 function ProductAdd() {
   const { data, error, isError, isLoading } = useQuery({
     queryKey: ["categorya"],
     queryFn: categoryService.getAll,
   });
+
+  const [selectedImage, setSelectedImage] = useState("");
 
   const queryClient = useQueryClient();
   const { control, register, handleSubmit, reset } = useForm();
@@ -23,6 +26,7 @@ function ProductAdd() {
     mutationFn: (formData: any) => productService.productCreate(formData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      setSelectedImage("");
     },
   });
 
@@ -38,7 +42,10 @@ function ProductAdd() {
 
     producCreateMutation.mutate(formData);
     reset();
-  
+  }
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setSelectedImage(URL.createObjectURL(e.target.files[0]));
   }
 
   if (isLoading) return <div>Загрузка...</div>;
@@ -65,7 +72,16 @@ function ProductAdd() {
           )}
         />
 
-        <Input type="file" {...register("image")} />
+        <Input type="file" {...register("image")} onChange={handleChange} />
+        {selectedImage && (
+          <Image
+            src={selectedImage}
+            width={500}
+            height={500}
+            alt="Picture of the author"
+          />
+        )}
+
         <Button type="submit">add</Button>
       </form>
       product-add
