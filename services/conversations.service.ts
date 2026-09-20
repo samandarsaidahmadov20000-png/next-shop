@@ -2,7 +2,7 @@ import api from "@/lib/axios";
 import { Conversations } from "@/types/conversations";
 
 export const conversations = {
-  conversationsGet: async (): Promise<Conversations[]> => {
+  conversationsGet: async (): Promise<{ conversations: Conversations[] }> => {
     const { data } = await api.get("/message/conversations");
     return data;
   },

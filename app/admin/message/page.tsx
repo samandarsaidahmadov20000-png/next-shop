@@ -29,7 +29,7 @@ function Message() {
       console.log("✅ ПОДКЛЮЧЁН!", socketRef.current.id);
     });
 
-    socketRef.current.on("connect_error", (err) => {
+    socketRef.current.on("connect_error", (err: any) => {
       console.log("❌ ОШИБКА:", err.message);
     });
 
@@ -49,12 +49,12 @@ function Message() {
 
   const { data, error, isError, isLoading } = useQuery({
     queryKey: ["conversation"],
-    queryFn: conversations.conversationsGet,
+    queryFn: () => conversations.conversationsGet(),
   });
 
   const { data: messagesData } = useQuery({
     queryKey: ["message", messageId],
-    queryFn: () => conversations.getUsersDialog(messageId),
+    queryFn: () => conversations.getUsersDialog(messageId as string),
     enabled: !!messageId,
   });
 

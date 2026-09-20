@@ -22,7 +22,7 @@ import Link from "next/link";
 function Orders() {
   const { data, error, isError, isLoading } = useQuery({
     queryKey: ["orders"],
-    queryFn: orderService.getAll,
+    queryFn: () => orderService.getAll(),
   });
 
 
@@ -85,7 +85,7 @@ function Orders() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.order.map(function (orders, index) {
+            {data?.order?.map(function (orders, index) {
               return (
                 <TableRow
                   key={orders?._id}

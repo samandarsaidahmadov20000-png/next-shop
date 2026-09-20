@@ -27,7 +27,10 @@ function ReusableSelect({
 
 
   return (
-    <Select onValueChange={onChange} items={items}>
+    <Select
+      onValueChange={(value: unknown) => onChange((value as string) ?? "")}
+      items={items}
+    >
       <SelectTrigger>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

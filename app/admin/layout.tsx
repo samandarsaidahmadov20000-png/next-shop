@@ -43,7 +43,7 @@ const navItems = [
         height="1em"
         viewBox="0 0 24 24"
       >
-        <title xmlns="">message</title>
+        <title>message</title>
         <path
           fill="none"
           stroke="currentColor"

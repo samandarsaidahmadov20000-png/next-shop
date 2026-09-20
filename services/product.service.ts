@@ -1,8 +1,8 @@
 import api from "@/lib/axios";
-import { Product } from "@/types/product";
+import { Product, ProductsResponse } from "@/types/product";
 
 export const productService = {
-  getAll: async (name = "", page = 1,category = ""): Promise<Product[]> => {
+  getAll: async (name = "", page = 1, category = ""): Promise<ProductsResponse> => {
     const { data } = await api.get(`/products?name=${name}&page=${page}&limit=10&category=${category}`);
     return data;
   },

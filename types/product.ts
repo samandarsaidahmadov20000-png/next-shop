@@ -7,3 +7,10 @@ export interface Product {
   category: { _id: string; name: string };
   image: string;
 }
+
+export interface ProductsResponse {
+  products: Product[];
+  total?: number;
+  page?: number;
+  limit?: number;
+}

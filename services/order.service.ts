@@ -3,7 +3,7 @@ import api from "@/lib/axios";
 
 
 export const orderService = {
-    getAll: async () => {
+    getAll: async (): Promise<{ order: any[] }> => {
         const {data} = await api.get('/order')
         return data
     },

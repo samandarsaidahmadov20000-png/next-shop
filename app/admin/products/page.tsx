@@ -23,7 +23,7 @@ import React from "react";
 function Products() {
   const { data, error, isError, isLoading } = useQuery({
     queryKey: ["products"],
-    queryFn: productService.getAll,
+    queryFn: () => productService.getAll(),
   });
 
   const queryClient = useQueryClient();
