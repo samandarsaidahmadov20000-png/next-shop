@@ -1,6 +1,8 @@
 "use client";
 
 import CustomDropdown from "@/components/dropdown";
+import { useIsLoggedIn } from "@/hooks/useIsLoggedIn";
+import { cartAuthService } from "@/services/cart.service";
 import { categoryService } from "@/services/category.service";
 
 import { productService } from "@/services/product.service";
@@ -22,7 +24,7 @@ function Header() {
 
   const { totalQuantity } = useCartStore();
 
-  const total = totalQuantity();
+  const isLoggedIn = useIsLoggedIn();
 
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -59,6 +61,21 @@ function Header() {
     queryKey: ["category"],
     queryFn: () => categoryService.getAll(),
   });
+  
+  // Корзина с сервера нужна только авторизованному, иначе /cart вернёт 401.
+  const { data: cartTotal } = useQuery({
+    queryKey: ["cart"],
+    queryFn: () => cartAuthService.cartGet(),
+    enabled: isLoggedIn,
+    retry: false,
+  });
+
+  // Гость считает по localStorage, авторизованный — по серверной корзине.
+  const total = isLoggedIn ? (cartTotal?.totalCount ?? 0) : totalQuantity();
+
+
+  
+
 
   // console.log(category?.categories);
 

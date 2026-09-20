@@ -20,6 +20,10 @@ type CartStore = {
   ) => void;
   quantityPlus: (id: string) => void;
   quantityMinus: (id: string) => void;
+  removeItem: (id: string) => void;
+  clearCart: () => void;
+  totalQuantity: () => number;
+  totalSum: () => number;
 };
 
 export const useCartStore = create<CartStore>()(
@@ -66,6 +70,11 @@ export const useCartStore = create<CartStore>()(
         set((state) => ({
           cart: state.cart.filter((item) => item.id !== id),
         })),
+      
+        clearCart: () => set({cart: []}),
+
+
+
     }),
     { name: "cart" },
   ),

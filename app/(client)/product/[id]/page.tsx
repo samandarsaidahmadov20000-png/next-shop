@@ -1,16 +1,160 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
+import { useState } from "react";
+import { toast } from "sonner";
+
 import { productService } from "@/services/product.service";
+import { cartAuthService } from "@/services/cart.service";
+import { useCartStore } from "@/store/cart.store";
+import { useIsLoggedIn } from "@/hooks/useIsLoggedIn";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  addItemToCart,
+  applyCartPatch,
+  rollbackCart,
+  setItemQuantity,
+  type ServerCartItem,
+  type ServerCartProduct,
+} from "@/lib/cart-cache";
 
 function ProductDetail() {
   const { id } = useParams();
+  const productId = id as string;
+
+  const {
+    cart,
+    addToCart: addToLocalCart,
+    quantityPlus,
+    quantityMinus,
+  } = useCartStore();
+
+  const queryClient = useQueryClient();
+  const isLoggedIn = useIsLoggedIn();
+
+  // Пока товара нет в корзине, +/- меняют только выбранное количество.
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
 
   const { data: product } = useQuery({
     queryKey: ["product", id],
-    queryFn: () => productService.getById(id as string),
+    queryFn: () => productService.getById(productId),
   });
+
+  const { data: cartGet } = useQuery({
+    queryKey: ["cart"],
+    queryFn: () => cartAuthService.cartGet(),
+    enabled: isLoggedIn,
+    retry: false,
+  });
+
+  const addToServerMutation = useMutation({
+    mutationFn: ({
+      product: item,
+      quantity,
+    }: {
+      product: ServerCartProduct;
+      quantity: number;
+    }) =>
+      cartAuthService.createCart({
+        items: [{ productId: item._id, quantity }],
+      }),
+    // Кэш правим сразу, чтобы количество не ждало ответа сервера.
+    onMutate: async ({ product: item, quantity }) => {
+      const previous = await applyCartPatch(
+        queryClient,
+        addItemToCart(item, quantity),
+      );
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      rollbackCart(queryClient, context?.previous);
+      toast.error("Не удалось добавить товар");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+  });
+
+  const updateToServerMutation = useMutation({
+    mutationFn: ({ id: itemId, quantity }: { id: string; quantity: number }) =>
+      cartAuthService.updateCart(itemId, quantity),
+    onMutate: async ({ id: itemId, quantity }) => {
+      const previous = await applyCartPatch(
+        queryClient,
+        setItemQuantity(itemId, quantity),
+      );
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      rollbackCart(queryClient, context?.previous);
+      toast.error("Не удалось изменить количество");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+  });
+
+  const localItem = cart.find((item) => item.id === productId);
+  const serverItem: ServerCartItem | undefined = cartGet?.cart?.items?.find(
+    (item: ServerCartItem) => item.product?._id === productId,
+  );
+
+  const cartQuantity = isLoggedIn
+    ? (serverItem?.quantity ?? 0)
+    : (localItem?.quantity ?? 0);
+
+  const inCart = cartQuantity > 0;
+  const quantity = inCart ? cartQuantity : selectedQuantity;
+
+  const isAdding = isLoggedIn && addToServerMutation.isPending && !inCart;
+
+  // Товар уже в корзине — +/- меняют корзину, иначе только выбор количества.
+  const changeQuantity = (next: number) => {
+    if (!inCart) {
+      setSelectedQuantity(next < 1 ? 1 : next);
+      return;
+    }
+
+    if (isLoggedIn) {
+      updateToServerMutation.mutate({ id: productId, quantity: next });
+      return;
+    }
+
+    if (next > cartQuantity) {
+      quantityPlus(productId);
+    } else {
+      quantityMinus(productId);
+    }
+  };
+
+  const handleAddToCart = () => {
+    if (!product) return;
+
+    if (isLoggedIn) {
+      addToServerMutation.mutate({
+        product: {
+          _id: productId,
+          name: product.name,
+          price: product.price,
+          image: product.image,
+        },
+        quantity: selectedQuantity,
+      });
+    } else {
+      addToLocalCart(
+        productId,
+        selectedQuantity,
+        product.name,
+        product.price,
+        product.image,
+      );
+    }
+
+    setSelectedQuantity(1);
+    toast.success("Товар добавлен в корзину");
+  };
 
   return (
     <div className="mx-auto max-w-[1240px] px-4 pb-16 sm:px-6">
@@ -206,20 +350,46 @@ function ProductDetail() {
           {/* Quantity + cart */}
           <div className="flex items-center gap-3 sm:gap-5">
             <div className="flex h-12 w-[110px] shrink-0 items-center justify-between rounded-full bg-[#F0F0F0] px-4 sm:h-[52px] sm:w-[170px] sm:px-6">
-              <span className="cursor-pointer text-2xl leading-none text-black select-none">
+              <button
+                type="button"
+                aria-label="Уменьшить количество"
+                className="cursor-pointer text-2xl leading-none text-black transition hover:opacity-60 select-none"
+                onClick={() => changeQuantity(quantity - 1)}
+              >
                 −
-              </span>
-              <span className="text-sm text-black sm:text-base">1</span>
-              <span className="cursor-pointer text-2xl leading-none text-black select-none">
+              </button>
+              <span className="text-sm text-black sm:text-base">{quantity}</span>
+              <button
+                type="button"
+                aria-label="Увеличить количество"
+                className="cursor-pointer text-2xl leading-none text-black transition hover:opacity-60 select-none"
+                onClick={() => changeQuantity(quantity + 1)}
+              >
                 +
-              </span>
+              </button>
             </div>
-            <a
-              href="/cart"
-              className="flex h-12 flex-1 items-center justify-center rounded-full bg-black px-8 text-sm text-white transition hover:opacity-80 sm:h-[52px] sm:text-base"
-            >
-              Add to Cart
-            </a>
+
+            {inCart ? (
+              <Link
+                href="/cart"
+                className="flex h-12 flex-1 items-center justify-center rounded-full bg-black px-8 text-sm text-white transition hover:opacity-80 sm:h-[52px] sm:text-base"
+              >
+                Перейти в корзину
+              </Link>
+            ) : (
+              <button
+                type="button"
+                disabled={!product || isAdding}
+                onClick={handleAddToCart}
+                className="flex h-12 flex-1 cursor-pointer items-center justify-center rounded-full bg-black px-8 text-sm text-white transition hover:opacity-80 disabled:opacity-60 sm:h-[52px] sm:text-base"
+              >
+                {isAdding ? (
+                  <Spinner className="size-5 text-white" />
+                ) : (
+                  "Добавить в корзину"
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>

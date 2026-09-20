@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import QueryProvider from "@/providers/query-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import AuthInitializer from "./AuthInitializer";
-
+import { Toaster } from "sonner";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -35,11 +35,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
-
-  
-
-
   return (
     <html
       lang="en"
@@ -64,6 +59,15 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
+            <Toaster
+              position="top-center"
+              richColors
+              duration={3000}
+              expand
+              toastOptions={{
+                style: { fontSize: "16px" },
+              }}
+            />
           </ThemeProvider>
         </QueryProvider>
       </body>

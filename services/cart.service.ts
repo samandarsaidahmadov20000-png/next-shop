@@ -10,7 +10,14 @@ export const cartAuthService = {
     const { data } = await api.post(`/cart`, productData);
     return data;
   },
-  
 
+  updateCart: async (productId: string, quantity: number) => {
+    const { data } = await api.put(`/cart/${productId}`, { quantity });
+    return data;
+  },
 
+  removeCart: async (productId: string) => {
+    const { data } = await api.delete(`/cart/${productId}`);
+    return data;
+  },
 };

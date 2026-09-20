@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { useCartStore } from "@/store/cart.store";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { authService } from "@/services/auth.service";
@@ -10,6 +11,8 @@ import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authStore } from "@/store/authStore";
+import { cartAuthService } from "@/services/cart.service";
+import { toast } from "@/components/ui/toast"
 
 const loginSchema = z.object({
   email: z.string().min(3, "Too short").max(50, "Too long"),
@@ -22,6 +25,9 @@ function Login() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const { login } = authStore();
+
+  const { cart, clearCart } = useCartStore();
+
   const {
     register,
     handleSubmit,
@@ -36,8 +42,18 @@ function Login() {
       localStorage.setItem("token", result.token);
       login();
       console.log("LOGIN SUCCESS");
-      const decoded = jwtDecode<{ id: string; role: string }>(result.token);
 
+      if (cart.length > 0) {
+        await cartAuthService.createCart({
+          items: cart.map((item) => ({
+            productId: item.id,
+            quantity: item.quantity,
+          })),
+        });
+
+        clearCart();
+      }
+      const decoded = jwtDecode<{ id: string; role: string }>(result.token);
       if (decoded.role == "admin") {
         router.push("/admin");
       } else {
@@ -47,6 +63,8 @@ function Login() {
       console.log("mistake", error);
     }
   };
+
+  // clearCart
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
